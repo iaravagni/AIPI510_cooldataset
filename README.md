@@ -15,7 +15,9 @@ To set up the environment and install the necessary packages, follow these steps
 2. Create a virtual environment (optional but recommended):
 
 ```bash
-Create a virtual environment (optional but recommended):
+python -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+
 ```
 
 3. Install the required packages:
