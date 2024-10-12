@@ -7,21 +7,21 @@ using TMPro;
 
 public class DataPlotter : MonoBehaviour
 {
-    public TextAsset csvFile; // CSV file
-    public GameObject spherePrefab; // Sphere prefab
-    public GameObject nameTagPrefab; // Prefab for the name tag
-    public Canvas mainCanvas; // Reference to the main Canvas
-    public float graphWidth = 3f;  // Width of the graph
-    public float graphHeight = 3f; // Height of the graph
-    public float sphereSpacing = 0.5f; // Spacing between spheres
+    public TextAsset csvFile; 
+    public GameObject spherePrefab; 
+    public GameObject nameTagPrefab; 
+    public Canvas mainCanvas; 
+    public float graphWidth = 3f;  
+    public float graphHeight = 3f; 
+    public float sphereSpacing = 0.5f; 
 
-    public GameObject axisPrefab; // Prefab para el eje
-    public float axisLength = 5f;  // Longitud de los ejes
+    public GameObject axisPrefab;
+    public float axisLength = 5f;  
 
 
     private Dictionary<string, List<DataPoint>> countryData = new Dictionary<string, List<DataPoint>>();
     private Dictionary<string, GameObject> countrySpheres = new Dictionary<string, GameObject>();
-    private Dictionary<string, GameObject> countryNameTags = new Dictionary<string, GameObject>(); // Dictionary to hold name tags
+    private Dictionary<string, GameObject> countryNameTags = new Dictionary<string, GameObject>(); 
     private int currentPeriod = 0;
     private bool isTransitioning = false;
 
@@ -39,7 +39,7 @@ public class DataPlotter : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && !isTransitioning)
         {
             currentPeriod++;
-            if (currentPeriod < 3)  // Assuming there are 3 periods in total
+            if (currentPeriod < 3)  // Assums 3 periods in total
             {
                 StartCoroutine(TransitionToNextPeriod());
             }
@@ -75,14 +75,11 @@ public class DataPlotter : MonoBehaviour
             }
             countryData[country].Add(dp);
         }
-
-        // Debug log to check if countries were loaded
-        Debug.Log($"Loaded countries: {string.Join(", ", countryData.Keys)}");
+    
     }
 
     void NormalizeData()
     {
-        Debug.Log("Normalize data...");
         minGDP = float.MaxValue; maxGDP = float.MinValue;
         minCO2 = float.MaxValue; maxCO2 = float.MinValue;
 
@@ -138,7 +135,7 @@ void CreateSpheresForFirstPeriod()
         }
 
         // Calculate name tag position based on the sphere's position
-        Vector3 nameTagOffset = new Vector3(0.6f, 0.6f, 0); // Adjust the offset as necessary
+        Vector3 nameTagOffset = new Vector3(0.6f, 0.6f, 0); 
         Vector3 nameTagPosition = worldPosition + nameTagOffset;
 
         // Set the name tag position
@@ -157,9 +154,8 @@ IEnumerator TransitionToNextPeriod()
     isTransitioning = true;
 
     float elapsedTime = 0;
-    float transitionDuration = 2f;  // Duración de la transición
+    float transitionDuration = 2f; 
 
-    // Guardar las posiciones iniciales de las esferas
     Dictionary<string, Vector3> initialPositions = new Dictionary<string, Vector3>();
 
     foreach (var country in countryData.Keys)
@@ -176,27 +172,24 @@ IEnumerator TransitionToNextPeriod()
         {
             DataPoint dp = countryData[country][currentPeriod];
 
-            // Calcular posiciones normalizadas basadas en los datos del período actual
+            // Normalized data positions based on current period
             float normalizedGDP = Normalize(dp.gdp, minGDP, maxGDP);
             float normalizedCO2 = Normalize(dp.co2, minCO2, maxCO2);
 
-            // Crear posición objetivo en función de los valores normalizados
             Vector3 plotCenter = this.transform.position;
             Vector3 localPosition = new Vector3(normalizedGDP * graphWidth, normalizedCO2 * graphHeight, 0);
             Vector3 targetPosition = plotCenter + this.transform.TransformDirection(localPosition);
 
-            // Interpolar la posición de la esfera y el nombre simultáneamente
             Vector3 newSpherePosition = Vector3.Lerp(initialPositions[country], targetPosition, t);
             countrySpheres[country].transform.position = newSpherePosition;
 
-            // Asegúrate de que el texto se mueva a la misma posición que la esfera
-            countryNameTags[country].transform.position = newSpherePosition + new Vector3(0, 0.5f, 0); // Ajusta la altura del texto
+            countryNameTags[country].transform.position = newSpherePosition + new Vector3(0, 0.5f, 0);
         }
 
         yield return null;
     }
 
-    // Asegurarse que al final de la transición, las posiciones sean correctas
+    
     foreach (var country in countryData.Keys)
     {
         DataPoint dp = countryData[country][currentPeriod];
